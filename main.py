@@ -98,6 +98,12 @@ def handle_collision(player_car, computer_car, game_info):
             computer_car.next_level(game_info.level)
 
 
+
+
+
+
+
+
 run = True
 clock = pygame.time.Clock()
 images = [(GRASS, (0, 0)), (TRACK, (0, 0)),
