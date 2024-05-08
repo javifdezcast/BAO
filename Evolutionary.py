@@ -1,4 +1,5 @@
 from Individual import Individual
+import
 
 POPULATION_SIZE = 50
 
@@ -14,11 +15,5 @@ class Population:
         return 0
 
     def fitness(self):
-        return 0
-
-    def cross(self):
-        return 0
-
-    def stop(self):
         return 0
 

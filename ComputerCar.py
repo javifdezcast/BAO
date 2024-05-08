@@ -2,7 +2,9 @@ import math
 import pygame
 
 from AbstractCar import AbstractCar
-from main import GREEN_CAR
+from utils import scale_image
+
+GREEN_CAR = scale_image(pygame.image.load("imgs/green-car.png"), 0.55)
 
 
 class ComputerCar(AbstractCar):

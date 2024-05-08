@@ -1,3 +1,4 @@
+import pygame
 from pygame import time
 
 
@@ -23,9 +24,9 @@ class GameInfo:
 
     def start_level(self):
         self.started = True
-        self.level_start_time = time.time()
+        self.level_start_time = pygame.time.get_ticks()/1000
 
     def get_level_time(self):
         if not self.started:
             return 0
-        return round(time.time() - self.level_start_time)
+        return round( pygame.time.get_ticks()/1000 - self.level_start_time)

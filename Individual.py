@@ -1,14 +1,18 @@
 import random
+import main.py
 from vector2 import Vector2
 from PIL import Image
 
 
-class individual:
+class Individual:
     def __init__(self, position, direction, simulation_time, time_step):
         steps = int(simulation_time / time_step)
         self.gen = []
         self.position = Vector2()
         self.direction = Vector2()
+        self.car = PlayerCar(4,4)
+        self.crashes = 0
+        self.checkpoints = 0
         for x in range(steps):
             self.gen.append((self.random_value(1), self.random_value(1)))
 
@@ -20,18 +24,24 @@ class individual:
         print(f"{self.direction} genome = {self.gen}", end=' ')
 
     def simulate(self):
-        self.direction.normalize()
+        # self.direction.normalize()
+        # positions = []
+        # velocity = Vector2()
+        # for g in self.gen:
+        #     print("directionbefore", self.direction)
+        #     self.direction.rotate(g[0])
+        #     print("directionafter", self.direction)
+        #
+        #     velocity += g[0] * self.direction
+        #     self.position += g[1] * velocity
+        #     pos = self.position
+        #     positions.append( pos )
+        # return positions
         positions = []
-        velocity = Vector2()
         for g in self.gen:
-            print("directionbefore", self.direction)
-            self.direction.rotate(g[0])
-            print("directionafter", self.direction)
-
-            velocity += g[0] * self.direction
-            self.position += g[1] * velocity
-            pos = self.position
-            positions.append( pos )
+            main.move_player(self.car, gen[0], gen[1])
+            reward = main.handle_collision(self.car)
+            positions.append( self.car.x, self.car.y)
         return positions
 
 

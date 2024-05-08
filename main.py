@@ -1,7 +1,5 @@
 import pygame
-import time
-import math
-import AbstractCar
+from Checkpoint import checkpoint
 from ComputerCar import ComputerCar
 from GameInfo import GameInfo
 from PlayerCar import PlayerCar
@@ -20,7 +18,6 @@ FINISH_MASK = pygame.mask.from_surface(FINISH)
 FINISH_POSITION = (130, 250)
 
 
-GREEN_CAR = scale_image(pygame.image.load("imgs/green-car.png"), 0.55)
 
 WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -28,11 +25,17 @@ pygame.display.set_caption("Racing Game!")
 
 MAIN_FONT = pygame.font.SysFont("comicsans", 44)
 
-FPS = 200
+FPS = 60
 PATH = [(175, 119), (110, 70), (56, 133), (70, 481), (318, 731), (404, 680), (418, 521), (507, 475), (600, 551),
         (613, 715), (736, 713),
         (734, 399), (611, 357), (409, 343), (433, 257), (697, 258), (738, 123), (581, 71), (303, 78), (275, 377),
         (176, 388), (178, 260)]
+
+CHECKPOINT_COORDINATES = [(90, 30), (19, 285), (199, 515), (281, 463), (381, 333), (506, 525), (530, 407), (435, 250),
+                          (278, 237), (438, 172), (531, 125), (336, 33), (186, 240)]
+CHECKPOINT_ANGLES = [90, 0, 45, 0, 90, 90, 0, 90, 0, 90, 0, 90, 0]
+CHECKPOINT_IMAGE = "imgs/checkpoint.png"
+CHECKPOINT_OBJECTS = []
 
 def draw(win, images, player_car, computer_car, game_info):
     for img, pos in images:
@@ -46,14 +49,36 @@ def draw(win, images, player_car, computer_car, game_info):
         f"Time: {game_info.get_level_time()}s", 1, (255, 255, 255))
     win.blit(time_text, (10, HEIGHT - time_text.get_height() - 40))
 
+    # vel_text = MAIN_FONT.render(
+    #     f"Vel: {round(player_car.vel, 1)}px/s", 1, (255, 255, 255))
+    # win.blit(vel_text, (10, HEIGHT - vel_text.get_height() - 10))
+
     vel_text = MAIN_FONT.render(
-        f"Vel: {round(player_car.vel, 1)}px/s", 1, (255, 255, 255))
-    win.blit(vel_text, (10, HEIGHT - vel_text.get_height() - 10))
+        f"Checkpoint: {round(player_car.chekpoint, 1)}", 1, (255, 255, 255))
+    win.blit(vel_text, (10, HEIGHT - vel_text.get_height() - 100))
 
     player_car.draw(win)
     computer_car.draw(win)
     pygame.display.update()
 
+
+def move_player(player_car, direction, angle):
+    keys = pygame.key.get_pressed()
+    moved = False
+
+    if keys[pygame.K_a] | angle == -1:
+        player_car.rotate(left=True)
+    if keys[pygame.K_d] | angle == 1:
+        player_car.rotate(right=True)
+    if keys[pygame.K_w] | direction ==1:
+        moved = True
+        player_car.move_forward()
+    if keys[pygame.K_s] | direction ==1:
+        moved = True
+        player_car.move_backward()
+
+    if not moved | direction == 0:
+        player_car.reduce_speed()
 
 def move_player(player_car):
     keys = pygame.key.get_pressed()
@@ -73,29 +98,30 @@ def move_player(player_car):
     if not moved:
         player_car.reduce_speed()
 
-def handle_collision(player_car, computer_car, game_info):
-    if player_car.collide(TRACK_BORDER_MASK) != None:
+def handle_collision(player_car, game_info):
+    if player_car.collide(TRACK_BORDER_MASK) is not None:
         player_car.bounce()
+    next_checkpoint = CHECKPOINT_OBJECTS[player_car.next_checkpoint()]
+    if player_car.collide(next_checkpoint.mask) is not None:
+        player_car.checkpoint = player_car.checkpoint+1
 
-    computer_finish_poi_collide = computer_car.collide(
-        FINISH_MASK, *FINISH_POSITION)
-    if computer_finish_poi_collide != None:
-        blit_text_center(WIN, MAIN_FONT, "You lost!")
-        pygame.display.update()
-        pygame.time.wait(5000)
-        game_info.reset()
-        player_car.reset()
-        computer_car.reset()
+    #    bound = -1
+    # else:
+    # #     bound = 0
+    # #
+    # # if pasacheckpoint:
+    # #     checkpoint = 1
+    #
+    # return bound, checkpoint
 
-    player_finish_poi_collide = player_car.collide(
-        FINISH_MASK, *FINISH_POSITION)
-    if player_finish_poi_collide != None:
-        if player_finish_poi_collide[1] == 0:
-            player_car.bounce()
-        else:
-            game_info.next_level()
-            player_car.reset()
-            computer_car.next_level(game_info.level)
+def load_checkpoints():
+    for i in range(13):
+        position = (CHECKPOINT_COORDINATES[i][0]*0.9*900/610, CHECKPOINT_COORDINATES[i][1]*0.9*900/610)
+        CHECKPOINT_OBJECTS.append(checkpoint(position, CHECKPOINT_ANGLES[i], CHECKPOINT_IMAGE, WIN))
+
+
+
+
 
 
 
@@ -106,8 +132,11 @@ def handle_collision(player_car, computer_car, game_info):
 
 run = True
 clock = pygame.time.Clock()
+load_checkpoints()
 images = [(GRASS, (0, 0)), (TRACK, (0, 0)),
           (FINISH, FINISH_POSITION), (TRACK_BORDER, (0, 0))]
+for checkpoint in CHECKPOINT_OBJECTS:
+    images.append((checkpoint.rotated, (checkpoint.x, checkpoint.y)))
 player_car = PlayerCar(4, 4)
 computer_car = ComputerCar(2, 4, PATH)
 game_info = GameInfo()
@@ -137,7 +166,7 @@ while run:
     move_player(player_car)
     computer_car.move()
 
-    handle_collision(player_car, computer_car, game_info)
+    handle_collision(player_car, game_info)
 
     if game_info.game_finished():
         blit_text_center(WIN, MAIN_FONT, "You won the game!")
