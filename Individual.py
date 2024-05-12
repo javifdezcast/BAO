@@ -1,7 +1,7 @@
 import random
-import main.py
+import main
+from PlayerCar import PlayerCar
 from vector2 import Vector2
-from PIL import Image
 
 
 class Individual:
@@ -39,7 +39,7 @@ class Individual:
         # return positions
         positions = []
         for g in self.gen:
-            main.move_player(self.car, gen[0], gen[1])
+            main.move_player(self.car, g[0], g[1])
             reward = main.handle_collision(self.car)
             positions.append( self.car.x, self.car.y)
         return positions
@@ -51,7 +51,7 @@ population_size = 1
 
 population = []
 for i in range(population_size):
-    population.append(individual(Vector2(), Vector2(1.0, 0.0), sim_time, sim_step))
+    population.append(Individual(Vector2(), Vector2(1.0, 0.0), sim_time, sim_step))
 
 for i in population:
     i.print_individual()

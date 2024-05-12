@@ -1,5 +1,4 @@
 from Individual import Individual
-import
 
 POPULATION_SIZE = 50
 

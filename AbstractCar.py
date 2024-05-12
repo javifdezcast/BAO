@@ -15,7 +15,7 @@ class AbstractCar:
         self.angle = 0
         self.x, self.y = self.START_POS
         self.acceleration = 0.1
-        self.chekpoint = 0
+        self.checkpoint = 0
 
     def rotate(self, left=False, right=False):
         if left:
@@ -54,7 +54,9 @@ class AbstractCar:
         self.vel = 0
 
     def next_checkpoint(self):
-        return self.chekpoint % 16
+        return self.checkpoint % 13
 
     def reset_checkpoint(self, x, y, angle):
-        return 0
+        self.x = x
+        self.y = y
+        self.angle = angle
