@@ -54,12 +54,14 @@ final_pop = ga.evolve(generator=evolutionary.generator,
                       evaluator=evolutionary.evaluator,
                       bounder=evolutionary.bounder,
                       maximize=evolutionary.maximize,
-                      pop_size=100,
-                      max_generations=100,
+                      pop_size=2,
+                      max_generations=3,
                       num_elites=1,
-                      num_selected=100,
+                      num_selected=3,
                       crossover_rate=1,
                       num_crossover_points=1,
                       mutation_rate=0.05)
 
 best = max(ga.population)
+print('Best Solution: {0}: {1}'.format(str(best.candidate), best.fitness))
+

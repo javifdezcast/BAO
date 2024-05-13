@@ -2,7 +2,6 @@ import math
 
 import pygame
 
-
 from utils import blit_rotate_center
 
 
@@ -32,7 +31,7 @@ class AbstractCar:
         self.move()
 
     def move_backward(self):
-        self.vel = max(self.vel - self.acceleration, -self.max_vel/2)
+        self.vel = max(self.vel - self.acceleration, -self.max_vel / 2)
         self.move()
 
     def move(self):
@@ -54,13 +53,16 @@ class AbstractCar:
         self.angle = 0
         self.vel = 0
 
+    # Devuelve el siguiente checkpoint por el que debe pasar el coche
     def next_checkpoint(self):
         return self.checkpoint % 13
 
+    # Resetea la posicion del coche al checkpoint anterior
     def reset_checkpoint(self, x, y, angle):
         self.x = x
         self.y = y
         self.angle = angle
 
+    # calcula la distancia al siguiente checkpoint
     def distance_next_checkpoint(self, x, y):
         return math.dist((self.x, self.y), (x, y))

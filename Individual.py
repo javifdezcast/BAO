@@ -12,13 +12,23 @@ class Individual:
         # self.direction = Vector2()
         self.car = PlayerCar(4,4)
         for x in range(steps):
-            self.gen.append((self.random_value(1), self.random_value(1)))
+            self.gen.append((self.random_direction(1), self.random_angle(1)))
 
-    def random_value(self, k):
+    def random_direction(self, k):
         num = random.random()
-        if num < 0.2:
+        if num < 0.3:
             return 0
-        elif num < 0.6:
+        elif num < 0.45:
+            return -1
+        else:
+            return 1
+
+
+    def random_angle(self, k):
+        num = random.random()
+        if num < 0.6:
+            return 0
+        elif num < 0.8:
             return-1
         else:
             return 1
