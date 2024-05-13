@@ -16,6 +16,7 @@ class AbstractCar:
         self.x, self.y = self.START_POS
         self.acceleration = 0.1
         self.checkpoint = 0
+        self.crashes = 0
 
     def rotate(self, left=False, right=False):
         if left:
@@ -60,3 +61,6 @@ class AbstractCar:
         self.x = x
         self.y = y
         self.angle = angle
+
+    def distance_next_checkpoint(self, x, y):
+        return math.dist((self.x, self.y), (x, y))
