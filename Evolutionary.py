@@ -65,3 +65,5 @@ final_pop = ga.evolve(generator=evolutionary.generator,
 best = max(ga.population)
 print('Best Solution: {0}: {1}'.format(str(best.candidate), best.fitness))
 
+pantalla = main.main()
+pantalla.view_solution(best.candidate)

@@ -8,7 +8,7 @@ class main:
 
     pygame.font.init()
 
-    #Carga imagenes nativas iniciales: fondo, pista, y fin
+    # Carga imagenes nativas iniciales: fondo, pista, y fin
     GRASS = scale_image(pygame.image.load("imgs/grass.jpg"), 2.5)
     TRACK = scale_image(pygame.image.load("imgs/track.png"), 0.9)
     TRACK_BORDER = scale_image(pygame.image.load("imgs/track-border.png"), 0.9)
@@ -37,8 +37,11 @@ class main:
     CHECKPOINT_CAR_ANGLES = [90, 180, 225, 0, 270, 270, 0, 90, 0, 270, 0, 90, 180]
     CHECKPOINT_IMAGE = "imgs/checkpoint.png"
 
-    #Declaración de la lista de checkpoints
+    # Declaración de la lista de checkpoints
     CHECKPOINT_OBJECTS = []
+
+    # Imagen usada para ver el camino de los coches tras su evolucion
+    POSICION = pygame.image.load("imgs/posicion.png")
 
     # Carga de checkpoint y carga de sus imagenes en la lista de imagenes a renderizar por frame.
     images = [(GRASS, (0, 0)), (TRACK, (0, 0)),
@@ -46,7 +49,6 @@ class main:
     for checkpoint in CHECKPOINT_OBJECTS:
         images.append((checkpoint.rotated, (checkpoint.x, checkpoint.y)))
     player_car = PlayerCar(4, 4)
-
 
     # Dibuja la ventana: no se usa en el evolutivo
     def draw(self, win, images, player_car, computer_car, game_info):
@@ -71,11 +73,9 @@ class main:
         vel_text = self.MAIN_FONT.render(
             f"Checkpoint: {round(player_car.checkpoint, 1)}", 1, (255, 255, 255))
         win.blit(vel_text, (10, self.HEIGHT - vel_text.get_height() - 100))
-
         player_car.draw(win)
         computer_car.draw(win)
         pygame.display.update()
-
 
     def move_player(self, direction, angle):
         keys = pygame.key.get_pressed()
@@ -119,14 +119,38 @@ class main:
     # Simula un genetico y devuelve su fitness
     def simulate(self, genoma):
         self.load_checkpoints()
+
         for g in genoma:
             self.move_player(g[0], g[1])
             self.handle_collision()
         check_x = self.CHECKPOINT_OBJECTS[self.player_car.next_checkpoint()].centre_x
         check_y = self.CHECKPOINT_OBJECTS[self.player_car.next_checkpoint()].centre_y
         values = (self.player_car.next_checkpoint(), self.player_car.distance_next_checkpoint(check_x, check_y), self.player_car.crashes)
-        return 100 * values[0] + values[1] - 10 * values[2]
+        return 100 * values[0] + 1000/values[1] - 10 * values[2]
 
+    def view_solution(self, genoma):
+        self.load_checkpoints()
+        posiciones = []
+        for g in genoma:
+            self.move_player(g[0], g[1])
+            self.handle_collision()
+            posiciones.append((self.player_car.x, self.player_car.y))
+
+    def draw_positions(self, posiciones):
+        for img, pos in self.images:
+            self.WIN.blit(img, pos)
+        for posicion in posiciones:
+            self.WIN.blit(self.POSICION, posicion)
+        pygame.display.update()
+        started = True
+        clock = pygame.time.Clock
+        while started:
+            clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    started = False
+                    break
 
 #
 # run = True
